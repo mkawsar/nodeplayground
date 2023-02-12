@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
     {
         _id: {
             type: String,
-            default: () => uuidv4().replace(/\-/g, "");
+            default: () => uuidv4().replace(/\-/g, "")
         },
         name: String,
         email: String,
