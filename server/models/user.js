@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -35,16 +35,11 @@ const userSchema = new mongoose.Schema(
         }
     },
     {
-        timestamps: true,
-        collection: 'users'
+        timestamps: true
     }
 );
 
-userSchema.pre('save', async (next) => {
-    if (!this.isModified('password')) {
-        return next();
-    }
-
+userSchema.pre('save', async function (next) {
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
@@ -53,4 +48,4 @@ userSchema.pre('save', async (next) => {
     }
 });
 
-export default mongoose.model('User', userSchema);
+export default mongoose.model('users', userSchema);

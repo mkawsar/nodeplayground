@@ -1,6 +1,7 @@
 import http from 'http';
 import express from 'express';
 import logger from 'morgan';
+import bodyParser from 'body-parser'
 
 // MIddleware
 import {decode} from './middlewares/jwt.js';
@@ -17,8 +18,8 @@ const port = process.env.PORT || '3000';
 app.set('port', port);
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', (req, res) => {
     res.status(200).json({
