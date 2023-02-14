@@ -1,7 +1,10 @@
+import {config as envconfig} from 'dotenv';
+envconfig();
+
 const config = {
     db: {
-        url: 'localhost:27017',
-        name: 'nodeplayground'
+        url: `${process.env.DB_HOST}:${process.env.DB_PORT}`,
+        name: `${process.env.DB_NAME}`
     }
 };
 

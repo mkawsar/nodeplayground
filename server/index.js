@@ -1,6 +1,7 @@
 import http from 'http';
 import express from 'express';
 import logger from 'morgan';
+import {config} from 'dotenv';
 import bodyParser from 'body-parser'
 
 // MIddleware
@@ -13,8 +14,10 @@ import userRouter from './routes/user.js';
 // Mongo connection
 import './config/mongo.js';
 
+config();
+
 const app = express();
-const port = process.env.PORT || '3000';
+const port = process.env.PORT || '4000';
 app.set('port', port);
 
 app.use(logger('dev'));
