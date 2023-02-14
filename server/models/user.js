@@ -10,10 +10,6 @@ export const USER_TYPE = {
 
 const userSchema = new mongoose.Schema(
     {
-        _id: {
-            type: String,
-            default: () => uuidv4().replace(/\-/g, "")
-        },
         name: {
             type: String,
             required: true,
@@ -24,7 +20,8 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             min: 3,
-            max: 255
+            max: 255,
+            unique: true
         },
         type: String,
         password: {
@@ -32,6 +29,26 @@ const userSchema = new mongoose.Schema(
             required: true,
             min: 6,
             max: 1024
+        },
+        mobile: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        role: {
+            type: String,
+            default: 'user'
+        },
+        isBlocked: {
+            type: Boolean,
+            default: false
+        },
+        cart: {
+            type: Array,
+            default: []
+        },
+        address: {
+            type: String
         }
     },
     {
