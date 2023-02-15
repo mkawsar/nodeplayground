@@ -65,4 +65,10 @@ userSchema.pre('save', async function (next) {
     }
 });
 
+
+userSchema.methods.isPasswordMatched = async function (enterPassword) {
+    // console.log(await bcrypt.compare(enterPassword, this.password));
+    return await bcrypt.compare(enterPassword, this.password);
+};
+
 export default mongoose.model('users', userSchema);

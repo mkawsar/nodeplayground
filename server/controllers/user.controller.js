@@ -1,6 +1,7 @@
 // utils
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
+import {generateToken} from '../config/jwt.js'
 
 export default {
     onGetAllUsers: async (req, res) => {
@@ -59,6 +60,41 @@ export default {
             }
             let user = await UserModel.deleteOne({ _id: req.params.id });
             return res.status(200).json({ success: true, message: 'User deleted successfully!' })
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.message });
+        }
+    },
+
+    onUserLogin: async (req, res) => {
+        try {
+            const validation = makeValidation(types => ({
+                payload: req.body,
+                checks: {
+                    email: {type: types.string},
+                    password: {type: types.string}
+                }
+            }));
+            if (!validation.success) {
+                return res.status(400).json(validation);
+            }
+            const {email, password} = req.body;
+
+            let findUser = await UserModel.findOne({ email: email });
+
+            if (!findUser) {
+                return res.status(404).json({ success: false, message: 'User not found' })
+            }
+            if (!await findUser.isPasswordMatched(password)) {
+                return res.status(400).json({ success: false, message: 'Invalid credentials' })
+            }
+
+            return res.status(200).json({ success: true, data: {
+                _id: findUser?.id,
+                name: findUser?.name,
+                email: findUser?.email,
+                mobile: findUser?.mobile,
+                _token: generateToken(findUser?._id)
+            }});
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }
