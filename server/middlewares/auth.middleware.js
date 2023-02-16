@@ -24,9 +24,9 @@ export const authMiddleware = async (req, res, next) => {
 };
 
 export const isAdmin = async (req, res, next) => {
-    const { email } = req.user;
+    const { email } = req?.user;
     const amdinUser = await User.findOne({ email });
-    if (amdinUser.role !== 'admin') {
+    if (amdinUser?.role !== 'admin') {
         return res.status(403).json({ success: false, error: 'You are not admin user' });
     } else {
         next();
