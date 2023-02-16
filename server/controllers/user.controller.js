@@ -1,7 +1,7 @@
 // utils
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
-import {generateToken} from '../config/jwt.js'
+import { generateToken } from '../config/jwt.js'
 
 export default {
     onGetAllUsers: async (req, res) => {
@@ -28,7 +28,8 @@ export default {
                     name: { type: types.string },
                     email: { type: types.string },
                     type: { type: types.enum, options: { enum: USER_TYPE } },
-                    password: { type: types.string }
+                    password: { type: types.string },
+                    mobile: { type: types.string }
                 }
             }));
 
@@ -70,14 +71,14 @@ export default {
             const validation = makeValidation(types => ({
                 payload: req.body,
                 checks: {
-                    email: {type: types.string},
-                    password: {type: types.string}
+                    email: { type: types.string },
+                    password: { type: types.string }
                 }
             }));
             if (!validation.success) {
                 return res.status(400).json(validation);
             }
-            const {email, password} = req.body;
+            const { email, password } = req.body;
 
             let findUser = await UserModel.findOne({ email: email });
 
@@ -88,13 +89,16 @@ export default {
                 return res.status(400).json({ success: false, message: 'Invalid credentials' })
             }
 
-            return res.status(200).json({ success: true, data: {
-                _id: findUser?.id,
-                name: findUser?.name,
-                email: findUser?.email,
-                mobile: findUser?.mobile,
-                _token: generateToken(findUser?._id)
-            }});
+            return res.status(200).json({
+                success: true,
+                data: {
+                    _id: findUser?.id,
+                    name: findUser?.name,
+                    email: findUser?.email,
+                    mobile: findUser?.mobile,
+                    _token: generateToken(findUser?._id)
+                }
+            });
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }

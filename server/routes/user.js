@@ -5,7 +5,7 @@ import {authMiddleware, isAdmin, isUser} from '../middlewares/auth.middleware.js
 const router = express.Router();
 
 router
-    .get('/', authMiddleware, userController.onGetAllUsers)
+    .get('/', authMiddleware, isUser, userController.onGetAllUsers)
     .post('/create', userController.onCreateUser)
     .get('/:id/details', userController.onGetUserById)
     .delete('/:id/delete', userController.onDereleteUserById)
