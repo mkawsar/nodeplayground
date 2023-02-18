@@ -130,8 +130,42 @@ export default {
                 mobile: req?.body?.mobile
             }, {
                 returnOriginal: false
+            }).select('-password');
+            return res.status(200).json({ success: true, message: user });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.message });
+        }
+    },
+
+    handleMyProfileUpdate: async (req, res) => {
+        try {
+            const { id } = req?.user;
+            const validation = makeValidation(types => ({
+                payload: req?.body,
+                checks: {
+                    name: { type: types.string, options: { empty: false } },
+                    type: { type: types.enum, options: { enum: USER_TYPE } },
+                    mobile: { type: types.string }
+                }
+            }));
+            if (!validation.success) {
+                return res.status(400).json(validation);
+            }
+
+            let findUser = await UserModel.findOne({ _id: id });
+
+            if (!findUser) {
+                return res.status(404).json({ success: false, message: 'Data not found!' })
+            }
+
+            const user = await UserModel.findOneAndUpdate({ _id: id }, {
+                name: req?.body?.name,
+                type: req?.body?.type,
+                mobile: req?.body?.mobile
+            }, {
+                returnOriginal: false
             });
-            res.status(200).json({ success: true, message: user });
+            return res.status(200).json({ success: true, message: user });
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }

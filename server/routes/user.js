@@ -10,6 +10,7 @@ router
     .get('/:id/details', userController.onGetUserById)
     .delete('/:id/delete', userController.onDereleteUserById)
     .post('/login', userController.onUserLogin)
-    .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById);
+    .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById)
+    .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate);
 
 export default router;
