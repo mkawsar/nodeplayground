@@ -103,4 +103,37 @@ export default {
             return res.status(500).json({ success: false, error: err?.message });
         }
     },
+
+    onUpdateUserById: async (req, res) => {
+        try {
+            const validation = makeValidation(types => ({
+                payload: req?.body,
+                checks: {
+                    name: { type: types.string, options: { empty: false } },
+                    type: { type: types.enum, options: { enum: USER_TYPE } },
+                    mobile: { type: types.string }
+                }
+            }));
+            if (!validation.success) {
+                return res.status(400).json(validation);
+            }
+
+            let findUser = await UserModel.findOne({ _id: req.params.id });
+
+            if (!findUser) {
+                return res.status(404).json({ success: false, message: 'Data not found!' })
+            }
+
+            const user = await UserModel.findOneAndUpdate({_id: req?.params?.id}, {
+                name: req?.body?.name,
+                type: req?.body?.type,
+                mobile: req?.body?.mobile
+            }, {
+                returnOriginal: false
+            });
+            res.status(200).json({ success: true, message: user });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.message });
+        }
+    },
 }

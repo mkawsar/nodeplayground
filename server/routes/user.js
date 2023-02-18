@@ -5,10 +5,11 @@ import {authMiddleware, isAdmin, isUser} from '../middlewares/auth.middleware.js
 const router = express.Router();
 
 router
-    .get('/', authMiddleware, isUser, userController.onGetAllUsers)
+    .get('/', authMiddleware, isAdmin, userController.onGetAllUsers)
     .post('/create', userController.onCreateUser)
     .get('/:id/details', userController.onGetUserById)
     .delete('/:id/delete', userController.onDereleteUserById)
-    .post('/login', userController.onUserLogin);
+    .post('/login', userController.onUserLogin)
+    .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById);
 
 export default router;
