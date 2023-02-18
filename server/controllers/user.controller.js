@@ -170,4 +170,41 @@ export default {
             return res.status(500).json({ success: false, error: err?.message });
         }
     },
+
+    handleBlockUser: async (req, res) => {
+        try {
+            let findUser = await UserModel.findOne({ _id: req?.params?.id });
+
+            if (!findUser) {
+                return res.status(404).json({ success: false, message: 'Data not found!' })
+            }
+
+            const user = await UserModel.findOneAndUpdate({ _id: req?.params?.id }, {
+                isBlocked: true
+            }, {
+                returnOriginal: false
+            });
+            return res.status(200).json({ success: true, message: user });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.message });
+        }
+    },
+    handleUnblockUser: async (req, res) => {
+        try {
+            let findUser = await UserModel.findOne({ _id: req?.params?.id });
+
+            if (!findUser) {
+                return res.status(404).json({ success: false, message: 'Data not found!' })
+            }
+
+            const user = await UserModel.findOneAndUpdate({ _id: req?.params?.id }, {
+                isBlocked: false
+            }, {
+                returnOriginal: false
+            });
+            return res.status(200).json({ success: true, message: user });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.message });
+        }
+    }
 }

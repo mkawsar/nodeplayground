@@ -11,6 +11,7 @@ router
     .delete('/:id/delete', userController.onDereleteUserById)
     .post('/login', userController.onUserLogin)
     .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById)
-    .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate);
+    .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate)
+    .put('/:id/unblock', authMiddleware, isAdmin, userController.handleUnblockUser);
 
 export default router;
