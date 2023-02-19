@@ -8,7 +8,7 @@ router
     .get('/', authMiddleware, isAdmin, userController.onGetAllUsers)
     .post('/create', userController.onCreateUser)
     .get('/:id/details', userController.onGetUserById)
-    .delete('/:id/delete', userController.onDereleteUserById)
+    .delete('/:id/delete', userController.onDeleteUserById)
     .post('/login', userController.onUserLogin)
     .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById)
     .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate)

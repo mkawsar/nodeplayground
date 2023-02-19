@@ -3,3 +3,4 @@ yarn.lock
 .vscode/
 yarn-error.log
 .env
+.idea/

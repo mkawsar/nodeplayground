@@ -1,11 +1,11 @@
 import http from 'http';
 import express from 'express';
 import logger from 'morgan';
-import {config} from 'dotenv';
+import { config } from 'dotenv';
 import bodyParser from 'body-parser'
 
 // MIddleware
-import {decode} from './middlewares/jwt.js';
+import { decode } from './middlewares/jwt.js';
 
 // Routes
 import indexRouter from './routes/index.js';
@@ -22,13 +22,13 @@ app.set('port', port);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
-        'message' : 'Welcome to nodeplayground'
+        'message': 'Welcome to nodeplayground'
     });
 });
 
