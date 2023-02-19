@@ -1,6 +1,6 @@
 import express from 'express';
 import userController from '../controllers/user.controller.js';
-import {authMiddleware, isAdmin, isUser} from '../middlewares/auth.middleware.js'
+import { authMiddleware, isAdmin, isUser } from '../middlewares/auth.middleware.js'
 
 const router = express.Router();
 
@@ -12,6 +12,7 @@ router
     .post('/login', userController.onUserLogin)
     .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById)
     .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate)
+    .put('/:id/blocked', authMiddleware, isAdmin, userController.handleBlockedUser)
     .put('/:id/unblock', authMiddleware, isAdmin, userController.handleUnblockUser);
 
 export default router;
