@@ -6,7 +6,7 @@ import { generateToken } from '../config/jwt.js'
 export default {
     onGetAllUsers: async (req, res) => {
         try {
-            let users = await UserModel.find().select('-password');
+            let users = await UserModel.find().select('-password').sort({ 'createdAt': -1 });
             return res.status(200).json({ success: true, data: users })
         } catch (error) {
             return res.status(500).json({ success: false, error: error?.message });
