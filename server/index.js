@@ -4,7 +4,7 @@ import logger from 'morgan';
 import { config } from 'dotenv';
 import bodyParser from 'body-parser'
 
-// MIddleware
+// Middleware
 import { decode } from './middlewares/jwt.js';
 
 // Routes
@@ -22,7 +22,7 @@ app.set('port', port);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 app.get('/', (req, res) => {
