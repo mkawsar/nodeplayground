@@ -94,7 +94,7 @@ export default {
                 return res.status(400).json({ success: false, message: 'Invalid credentials' })
             }
 
-            const refreshToken = await generateRefreshToken(findUser?._id);
+            const refreshToken = generateRefreshToken(findUser?._id);
             const updateUser = await UserModel.findByIdAndUpdate(findUser?._id, {
                 refreshToken: refreshToken,
             }, {
@@ -247,5 +247,31 @@ export default {
             const accessToken = generateToken(user?.id);
             return res.status(200).json({ success: false, message: 'Generated new access token', 'token': accessToken });
         });
+    },
+
+    handleLogout: async (req, res) => {
+        const cookie = req.cookies;
+        if (!cookie?.refreshToken) {
+            return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
+        }
+        const refreshToken =  cookie?.refreshToken;
+        const user = await UserModel.findOne({ refreshToken });
+        if (!user) {
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true
+            });
+            return res.status(404).json({ success: false, message: 'No refresh token present in database or not matched' });
+        }
+
+        await UserModel.findOneAndUpdate({ refreshToken }, {
+            refreshToken: ''
+        });
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true
+        });
+
+        return res.status(200).json({ success: false, message: 'Successfully logout' });
     },
 }
