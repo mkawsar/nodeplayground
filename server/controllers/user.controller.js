@@ -2,6 +2,7 @@
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
 import { generateToken } from '../config/jwt.js'
+import {validateMongodbId} from '../utils/validateMongodbId.js';
 
 export default {
     onGetAllUsers: async (req, res) => {
@@ -14,6 +15,7 @@ export default {
     },
     onGetUserById: async (req, res) => {
         try {
+            validateMongodbId(req.params.id);
             let user = await UserModel.findById(req.params.id).select('-password');
             return res.status(200).json({ success: true, data: user })
         } catch (err) {

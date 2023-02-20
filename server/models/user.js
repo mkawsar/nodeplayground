@@ -47,9 +47,8 @@ const userSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        address: {
-            type: String
-        }
+        address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }],
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
     },
     {
         timestamps: true
@@ -67,7 +66,6 @@ userSchema.pre('save', async function (next) {
 
 
 userSchema.methods.isPasswordMatched = async function (enterPassword) {
-    // console.log(await bcrypt.compare(enterPassword, this.password));
     return await bcrypt.compare(enterPassword, this.password);
 };
 
