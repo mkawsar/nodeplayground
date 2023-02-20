@@ -1,7 +1,7 @@
 // utils
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
-import { generateToken } from '../config/jwt.js'
+import { generateToken, generateRefreshToken } from '../config/jwt.js'
 import {validateMongodbId} from '../utils/validateMongodbId.js';
 
 export default {
@@ -90,6 +90,18 @@ export default {
             if (!await findUser.isPasswordMatched(password)) {
                 return res.status(400).json({ success: false, message: 'Invalid credentials' })
             }
+
+            const refreshToken = await generateRefreshToken(findUser?._id);
+            const updateUser = await UserModel.findByIdAndUpdate(findUser?._id, {
+                refreshToken: refreshToken,
+            }, {
+                new: true
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                maxAge: 72 * 60 * 60 * 1000,
+            });
 
             return res.status(200).json({
                 success: true,
