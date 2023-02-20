@@ -1,8 +1,11 @@
 // utils
+import jwt from 'jsonwebtoken';
+import {config as envconfig} from 'dotenv';
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
-import { generateToken, generateRefreshToken } from '../config/jwt.js'
 import {validateMongodbId} from '../utils/validateMongodbId.js';
+import { generateToken, generateRefreshToken } from '../config/jwt.js'
+envconfig();
 
 export default {
     onGetAllUsers: async (req, res) => {
@@ -224,5 +227,25 @@ export default {
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }
-    }
+    },
+
+    handleRefreshToken: async (req, res) => {
+        const cookie = req.cookies;
+        if (!cookie?.refreshToken) {
+            return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
+        }
+
+        const refreshToken =  cookie?.refreshToken;
+        const user = await UserModel.findOne({ refreshToken });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No refresh token present in database or not matched' });
+        }
+        jwt.verify(refreshToken, process.env.JWT_SECRET, (err, decoded) => {
+            if (err || user?.id !== decoded.id) {
+                return res.status(404).json({ success: false, message: 'There is something wrong with refresh token' });
+            }
+            const accessToken = generateToken(user?.id);
+            return res.status(200).json({ success: false, message: 'Generated new access token', 'token': accessToken });
+        });
+    },
 }

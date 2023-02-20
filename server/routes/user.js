@@ -13,6 +13,7 @@ router
     .put('/:id/update', authMiddleware, isAdmin, userController.onUpdateUserById)
     .put('/update/profile', authMiddleware, userController.handleMyProfileUpdate)
     .put('/:id/blocked', authMiddleware, isAdmin, userController.handleBlockedUser)
-    .put('/:id/unblock', authMiddleware, isAdmin, userController.handleUnblockUser);
+    .put('/:id/unblock', authMiddleware, isAdmin, userController.handleUnblockUser)
+    .put('/refresh/token', userController.handleRefreshToken);
 
 export default router;
