@@ -5,12 +5,10 @@ import { config } from 'dotenv';
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser';
 
-// Middleware
-import { decode } from './middlewares/jwt.js';
-
 // Routes
-import indexRouter from './routes/index.js';
 import userRouter from './routes/user.js';
+import indexRouter from './routes/index.js';
+import ProductRoute from './routes/product.js';
 
 // Mongo connection
 import './config/mongo.js';
@@ -36,6 +34,7 @@ app.get('/', (req, res) => {
 
 app.use('/', indexRouter);
 app.use('/api/users', userRouter);
+app.use('/api/product', ProductRoute);
 
 /** catch 404 and forward to error handler */
 app.use('*', (req, res) => {

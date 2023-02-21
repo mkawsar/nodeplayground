@@ -1,10 +1,5 @@
 import mongoose from 'mongoose';
 
-export const PRODUCT_TYPE = {
-    CONSUMER: 'consumer',
-    SUPPORT: 'support'
-};
-
 const productSchema = new mongoose.Schema(
     {
         title: {
@@ -31,14 +26,15 @@ const productSchema = new mongoose.Schema(
             ref: 'categories'
         },
         quantity: {
-            type: Number
+            type: Number,
+            required: true
         },
         images: {
             type: Array
         },
         color: {
             type: String,
-            enum: ['black', 'brown', 'red']
+            required: true
         },
         ratings: [{
             star: Number,
@@ -46,7 +42,7 @@ const productSchema = new mongoose.Schema(
         }],
         brand: {
             type: String,
-            enum: ['apple', 'samsung', 'lenovo']
+            required: true
         },
         sold: {
             type: Number,
