@@ -5,8 +5,10 @@ import {createProductValidation} from '../validators/product.validator.js';
 export default {
     handleGetAllProduct: async (req, res) => {
         try {
-            let products = await Product.find().sort({ createdAt: '-1' });
-            return res.status(200).json({success: true, message: 'Get all products', data: products});
+            const { page = 1, limit = 10 } = req.query;
+            let products = await Product.find().skip((page - 1) * limit).limit(limit * 1).sort({ createdAt: '-1' }).exec();
+            const count = await Product.countDocuments();
+            return res.status(200).json({success: true, message: 'Get all products', data: products, totalPages: Math.ceil(count / limit), currentPage: page});
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }
