@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 
 
 export const USER_TYPE = {
@@ -47,8 +46,8 @@ const userSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }],
-        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+        address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'addresses' }],
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
         refreshToken: {
             type: String
         }
