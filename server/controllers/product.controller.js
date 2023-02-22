@@ -39,7 +39,7 @@ export default {
                     return res.status(404).json({ success: false, error: 'This page does not exists.' });
                 }
             }
-            const product = await query;
+            const product = await query.populate({path: 'createdBy', select: 'name -_id'}).populate({path: 'updatedBy', select: 'name -_id'});
 
             return res.status(200).json({success: true, message: 'Get all products', data: product, pages: Math.ceil(ProductCount / limit), current: page});
     
