@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
-import { v4 as uuidv4 } from 'uuid';
 
 
 export const USER_TYPE = {
@@ -47,7 +46,9 @@ const userSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
-        address: {
+        address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'addresses' }],
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
+        refreshToken: {
             type: String
         }
     },
@@ -67,7 +68,6 @@ userSchema.pre('save', async function (next) {
 
 
 userSchema.methods.isPasswordMatched = async function (enterPassword) {
-    // console.log(await bcrypt.compare(enterPassword, this.password));
     return await bcrypt.compare(enterPassword, this.password);
 };
 

@@ -1,7 +1,11 @@
 // utils
+import jwt from 'jsonwebtoken';
+import {config as envconfig} from 'dotenv';
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
-import { generateToken } from '../config/jwt.js'
+import {validateMongodbId} from '../utils/validateMongodbId.js';
+import { generateToken, generateRefreshToken } from '../config/jwt.js'
+envconfig();
 
 export default {
     onGetAllUsers: async (req, res) => {
@@ -14,6 +18,7 @@ export default {
     },
     onGetUserById: async (req, res) => {
         try {
+            validateMongodbId(req.params.id);
             let user = await UserModel.findById(req.params.id).select('-password');
             return res.status(200).json({ success: true, data: user })
         } catch (err) {
@@ -88,6 +93,18 @@ export default {
             if (!await findUser.isPasswordMatched(password)) {
                 return res.status(400).json({ success: false, message: 'Invalid credentials' })
             }
+
+            const refreshToken = generateRefreshToken(findUser?._id);
+            const updateUser = await UserModel.findByIdAndUpdate(findUser?._id, {
+                refreshToken: refreshToken,
+            }, {
+                new: true
+            });
+
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                maxAge: 72 * 60 * 60 * 1000,
+            });
 
             return res.status(200).json({
                 success: true,
@@ -210,5 +227,51 @@ export default {
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.message });
         }
-    }
+    },
+
+    handleRefreshToken: async (req, res) => {
+        const cookie = req.cookies;
+        if (!cookie?.refreshToken) {
+            return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
+        }
+
+        const refreshToken =  cookie?.refreshToken;
+        const user = await UserModel.findOne({ refreshToken });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'No refresh token present in database or not matched' });
+        }
+        jwt.verify(refreshToken, process.env.JWT_SECRET, (err, decoded) => {
+            if (err || user?.id !== decoded.id) {
+                return res.status(404).json({ success: false, message: 'There is something wrong with refresh token' });
+            }
+            const accessToken = generateToken(user?.id);
+            return res.status(200).json({ success: false, message: 'Generated new access token', 'token': accessToken });
+        });
+    },
+
+    handleLogout: async (req, res) => {
+        const cookie = req.cookies;
+        if (!cookie?.refreshToken) {
+            return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
+        }
+        const refreshToken =  cookie?.refreshToken;
+        const user = await UserModel.findOne({ refreshToken });
+        if (!user) {
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: true
+            });
+            return res.status(404).json({ success: false, message: 'No refresh token present in database or not matched' });
+        }
+
+        await UserModel.findOneAndUpdate({ refreshToken }, {
+            refreshToken: ''
+        });
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true
+        });
+
+        return res.status(200).json({ success: false, message: 'Successfully logout' });
+    },
 }

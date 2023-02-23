@@ -5,9 +5,10 @@ envconfig();
 
 
 export const authMiddleware = async (req, res, next) => {
+    const cookie = req.cookies;
     let token = '';
-    if (req?.headers?.authorization?.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
+    if (cookie?.refreshToken) {
+        token = cookie?.refreshToken;
         try {
             if (token) {
                 const decode = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,7 +20,7 @@ export const authMiddleware = async (req, res, next) => {
             return res.status(403).json({ success: false, error: err?.message });
         }
     } else {
-        return res.status(403).json({ success: false, error: 'There is no token attached to header' });
+        return res.status(403).json({ success: false, error: 'There is no token in cookie' });
     }
 };
 
