@@ -4,9 +4,6 @@ import logger from 'morgan';
 import { config } from 'dotenv';
 import bodyParser from 'body-parser'
 
-// Middleware
-import { decode } from './middlewares/jwt.js';
-
 // Routes
 import indexRouter from './routes/index.js';
 import userRouter from './routes/user.js';
