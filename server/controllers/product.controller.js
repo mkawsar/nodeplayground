@@ -1,5 +1,6 @@
 import slugify from 'slugify';
 import Product from '../models/products.js';
+import { validateMongodbId } from '../utils/validateMongodbId.js';
 import {createProductValidation} from '../validators/product.validator.js';
 
 export default {
@@ -68,5 +69,15 @@ export default {
                 return res.status(500).json({ success: false, error: err?.errors });
             }
         }
-    }
+    },
+
+    handleGetProductDetails: async (req, res) => {
+        const {id} = req.params;
+        validateMongodbId(id);
+        try {
+            return res.status(200).json({success: true, data: id});
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err?.errors });
+        }
+    },
 };

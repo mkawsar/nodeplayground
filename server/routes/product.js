@@ -6,5 +6,7 @@ const router = express.Router();
 
 router
     .get('/list', authMiddleware, productController.handleGetAllProduct)
-    .post('/create', authMiddleware, productController.handleCreateProduct);
+    .post('/create', authMiddleware, productController.handleCreateProduct)
+    .get('/:id/details', authMiddleware, productController.handleGetProductDetails);
+
 export default router;
