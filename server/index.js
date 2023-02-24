@@ -13,6 +13,10 @@ import ProductRoute from './routes/product.js';
 // Mongo connection
 import './config/mongo.js';
 
+// Scheduler Job
+// import {schedulerJob} from './schedulers/cron.js';
+// schedulerJob;
+
 config();
 
 const app = express();

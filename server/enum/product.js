@@ -11,4 +11,4 @@ export const BRANDS = {
     APPLE: 'apple',
     SAMSUNG: 'samsung',
     LENOVO: 'lenovo'
-}
+};
