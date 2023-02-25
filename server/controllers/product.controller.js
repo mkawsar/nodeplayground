@@ -40,7 +40,7 @@ export default {
                     return res.status(404).json({ success: false, error: 'This page does not exists.' });
                 }
             }
-            const product = await query.populate({path: 'createdBy', select: 'name -_id'}).populate({path: 'updatedBy', select: 'name -_id'});
+            const product = await query.populate({path: 'createdBy', select: 'name _id'}).populate({path: 'updatedBy', select: 'name _id'});
 
             return res.status(200).json({success: true, message: 'Get all products', data: product, pages: Math.ceil(ProductCount / limit), current: page});
     
@@ -73,9 +73,15 @@ export default {
 
     handleGetProductDetails: async (req, res) => {
         const {id} = req.params;
-        validateMongodbId(id);
+        let checkID = validateMongodbId(id);
+
+        if (!checkID) {
+            return res.status(404).json({ success: false, error: 'This id is not valid or not found' });
+        }
+
         try {
-            return res.status(200).json({success: true, data: id});
+            const product = await Product.findById(id).populate({path: 'createdBy', select: 'name _id'}).populate({path: 'updatedBy', select: 'name _id'}).select('-__v');
+            return res.status(200).json({success: true, data: product});
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.errors });
         }
