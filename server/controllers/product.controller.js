@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 import Product from '../models/products.js';
 import { validateMongodbId } from '../utils/validateMongodbId.js';
-import {createProductValidation} from '../validators/product.validator.js';
+import {createProductValidation, updateProductValidation} from '../validators/product.validator.js';
 
 export default {
     handleGetAllProduct: async (req, res) => {
@@ -66,7 +66,7 @@ export default {
             if (!err?.errors) {
                 return res.status(500).json({ success: false, error: err?.message });
             } else {
-                return res.status(500).json({ success: false, error: err?.errors });
+                return res.status(428).json({ success: false, error: err?.errors });
             }
         }
     },
@@ -84,6 +84,37 @@ export default {
             return res.status(200).json({success: true, data: product});
         } catch (err) {
             return res.status(500).json({ success: false, error: err?.errors });
+        }
+    },
+
+    handleUpdateProduct: async (req, res) => {
+        const {id} = req.params;
+        let checkID = validateMongodbId(id);
+
+        if (!checkID) {
+            return res.status(404).json({ success: false, error: 'This id is not valid or not found' });
+        }
+
+        try {
+            const userID = req?.user?._id;
+            const {body} = req;
+
+            createProductValidation.validateSync(body, {abortEarly: false, stripUnknown: true});
+
+            if (req.body.title) {
+                req.body.slug = slugify(req.body.title.toLowerCase());
+            }
+            req.body.updatedBy = userID;
+
+            const product = await Product.findOneAndUpdate({_id: id}, req?.body, {returnOriginal: false});
+
+            return res.status(200).json({success: true, message: product});
+        } catch (err) {
+            if (!err?.errors) {
+                return res.status(500).json({ success: false, error: err?.message });
+            } else {
+                return res.status(428).json({ success: false, error: err?.errors });
+            }
         }
     },
 };
