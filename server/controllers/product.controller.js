@@ -99,7 +99,7 @@ export default {
             const userID = req?.user?._id;
             const {body} = req;
 
-            createProductValidation.validateSync(body, {abortEarly: false, stripUnknown: true});
+            updateProductValidation.validateSync(body, {abortEarly: false, stripUnknown: true});
 
             if (req.body.title) {
                 req.body.slug = slugify(req.body.title.toLowerCase());
