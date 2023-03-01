@@ -117,4 +117,35 @@ export default {
             }
         }
     },
+
+    handleDeleteProduct: async (req, res) => {
+        const {id} = req.params;
+
+        let checkID = validateMongodbId(id);
+
+        if (!checkID) {
+            return res.status(404).json({ success: false, error: 'This id is not valid or not found' });
+        }
+
+        try {
+            const product = await Product.findById(id);
+            if (!product) {
+                return res.status(404).json({ success: false, message: 'Data not found!' })
+            }
+
+            const deletedProduct = await Product.findByIdAndDelete(id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Product deleted successfully',
+                data: deletedProduct
+            });
+        } catch (err) {
+            if (!err?.errors) {
+                return res.status(500).json({ success: false, error: err?.message });
+            } else {
+                return res.status(428).json({ success: false, error: err?.errors });
+            }
+        }
+    }
 };
