@@ -153,6 +153,6 @@ export default {
         const {_id} = req?.user;
         const {productID} = req?.body;
 
-        return res.status(200).json({success: true, message: 'Product add to wish list'};)
+        return res.status(200).json({success: true, message: 'Product add to wish list'});
     },
 };
