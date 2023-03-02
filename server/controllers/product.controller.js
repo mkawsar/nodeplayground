@@ -147,5 +147,12 @@ export default {
                 return res.status(428).json({ success: false, error: err?.errors });
             }
         }
-    }
+    },
+
+    handleAddProductWishList: async (req, res) => {
+        const {_id} = req?.user;
+        const {productID} = req?.body;
+
+        return res.status(200).json({success: true, message: 'Product add to wish list'};)
+    },
 };
