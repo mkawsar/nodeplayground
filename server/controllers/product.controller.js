@@ -1,7 +1,8 @@
 import slugify from 'slugify';
+import User from '../models/user.js';
 import Product from '../models/products.js';
 import { validateMongodbId } from '../utils/validateMongodbId.js';
-import {createProductValidation, updateProductValidation} from '../validators/product.validator.js';
+import {createProductValidation, updateProductValidation, wishlistProductValidator} from '../validators/product.validator.js';
 
 export default {
     handleGetAllProduct: async (req, res) => {
@@ -48,6 +49,7 @@ export default {
             return res.status(500).json({ success: false, error: err?.message });
         }
     },
+
     handleCreateProduct: async (req, res) => {
         try {
             const {id} = req?.user;
@@ -149,10 +151,35 @@ export default {
         }
     },
 
-    handleAddProductWishList: async (req, res) => {
-        const {_id} = req?.user;
-        const {productID} = req?.body;
+    handleAddProductWishlist: async (req, res) => {
+        try {
+            const userID = req?.user?._id;
+            const {body} = req;
 
-        return res.status(200).json({success: true, message: 'Product add to wish list'});
+            wishlistProductValidator.validateSync(body, {abortEarly: false, stripUnknown: true});
+            const checkID = validateMongodbId(body?.product_id);
+            if (!checkID) {
+                return res.status(404).json({ success: false, error: 'This id is not valid or not found' });
+            }
+
+            const user = await User.findById(userID);
+            const alreadyAdded = user.wishlist.find((id) => id.toString() === body?.product_id);
+            if (alreadyAdded) {
+                let user = await User.findByIdAndUpdate(userID, {
+                    $pull: {wishlist: body?.product_id},
+                }, {
+                    new: true
+                });
+                return res.status(201).json({success: true, data: user});
+            } else {
+                return res.status(200).json({success: true, message: 'Already added this product on your wishlist.'});
+            }
+        } catch (err) {
+            if (!err?.errors) {
+                return res.status(500).json({ success: false, error: err?.message });
+            } else {
+                return res.status(428).json({ success: false, error: err?.errors });
+            }
+        }
     },
 };

@@ -19,3 +19,7 @@ export const updateProductValidation = yup.object({
     color: yup.string().required().oneOf([COLORS.BLACK, COLORS.BROWN, COLORS.GREEN, COLORS.PINK, COLORS.RED, COLORS.WHITE]),
     brand: yup.string().required().oneOf([BRANDS.APPLE, BRANDS.LENOVO, BRANDS.SAMSUNG])
 }).required();
+
+export const wishlistProductValidator = yup.object({
+    product_id: yup.string().trim().required()
+}).required();
