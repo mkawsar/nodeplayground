@@ -182,4 +182,49 @@ export default {
             }
         }
     },
+
+    handleProductRating: async (req, res) => {
+        const userID = req?.user?._id;
+        try {
+            const {star, productID, comment} = req?.body;
+
+            const product = await Product.findById(productID);
+            let existsProductRated = product.ratings.find((userID) => userID.postedby.toString() === userID.toString());
+            if (existsProductRated) {
+                const updateRating = await Product.updateOne(
+                    {ratings: { $elemMatch: existsProductRated }},
+                    { $set: { "ratings.$.star": star, "ratings.$.comment": comment } },
+                    { new: true }
+                );
+            } else {
+                const rateProduct = await Product.findByIdAndUpdate(productID,
+                    {
+                        $push: {
+                            ratings: { star: star, comment: comment, postedby: userID }
+                        }
+                    },
+                    {
+                        new: true
+                    }
+                );
+            }
+
+            const getAllRatings = await Product.findById(productID);
+        
+            let totalRating = getAllRatings.ratings.length;
+            let ratingSum = getAllRatings.ratings.map((item) => item.star).reduce((prev, curr) => prev + curr, 0);
+            let actualRating = Math.round(ratingSum / totalRating);
+            let finalProduct = await Product.findByIdAndUpdate(productID,
+                {total_rating: actualRating},
+                {new: true}
+            );
+            return res.status(200).json({success: true, message: 'Added rating successfully this product', data: finalProduct});
+        } catch (err) {
+            if (!err?.errors) {
+                return res.status(500).json({ success: false, error: err?.message });
+            } else {
+                return res.status(428).json({ success: false, error: err?.errors });
+            }
+        }
+    },
 };

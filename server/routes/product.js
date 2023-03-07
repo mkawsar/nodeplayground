@@ -10,6 +10,7 @@ router
     .get('/:id/details', authMiddleware, productController.handleGetProductDetails)
     .put('/:id/update', authMiddleware, productController.handleUpdateProduct)
     .delete('/:id/delete', authMiddleware, productController.handleDeleteProduct)
-    .post('/add/wishlist', authMiddleware, productController.handleAddProductWishlist);
+    .post('/add/wishlist', authMiddleware, productController.handleAddProductWishlist)
+    .put('/rating', authMiddleware, productController.handleProductRating);
 
 export default router;
