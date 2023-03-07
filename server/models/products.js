@@ -40,6 +40,10 @@ const productSchema = new mongoose.Schema(
             star: Number,
             postedby: {type: mongoose.Schema.Types.ObjectId, ref: 'users'}
         }],
+        total_rating: {
+            type: String,
+            default: 0,
+        },
         brand: {
             type: String,
             required: true
