@@ -4,7 +4,7 @@ export const COLORS = {
     BROWN: 'brown',
     PINK: 'pink',
     GREEN: 'green',
-    'WHITE': 'white'
+    WHITE: 'white'
 };
 
 export const BRANDS = {
