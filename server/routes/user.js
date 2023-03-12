@@ -15,6 +15,7 @@ router
     .put('/:id/blocked', authMiddleware, isAdmin, userController.handleBlockedUser)
     .put('/:id/unblock', authMiddleware, isAdmin, userController.handleUnblockUser)
     .put('/refresh/token', userController.handleRefreshToken)
-    .get('/logout', authMiddleware, userController.handleLogout);
+    .get('/logout', authMiddleware, userController.handleLogout)
+    .put('/reset/password', authMiddleware, userController.handlePasswordReset);
 
 export default router;

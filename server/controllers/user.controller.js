@@ -1,10 +1,12 @@
 // utils
 import jwt from 'jsonwebtoken';
-import {config as envconfig} from 'dotenv';
+import { config as envconfig } from 'dotenv';
 import makeValidation from '@withvoid/make-validation';
 import UserModel, { USER_TYPE } from '../models/user.js';
-import {validateMongodbId} from '../utils/validateMongodbId.js';
+import { validateMongodbId } from '../utils/validateMongodbId.js';
 import { generateToken, generateRefreshToken } from '../config/jwt.js'
+import { userResetPasswordValidation } from '../validators/user.validator.js';
+
 envconfig();
 
 export default {
@@ -16,6 +18,7 @@ export default {
             return res.status(500).json({ success: false, error: error?.message });
         }
     },
+
     onGetUserById: async (req, res) => {
         try {
             validateMongodbId(req.params.id);
@@ -25,6 +28,7 @@ export default {
             return res.status(500).json({ success: false, error: err?.message });
         }
     },
+
     onCreateUser: async (req, res) => {
         try {
             const validation = makeValidation(types => ({
@@ -57,6 +61,7 @@ export default {
             return res.status(500).json({ success: false, error: error?.message });
         }
     },
+
     onDeleteUserById: async (req, res) => {
         try {
             let findUser = await UserModel.findOne({ _id: req.params.id });
@@ -210,6 +215,7 @@ export default {
             return res.status(500).json({ success: false, error: err?.message });
         }
     },
+
     handleUnblockUser: async (req, res) => {
         try {
             let findUser = await UserModel.findOne({ _id: req?.params?.id });
@@ -235,7 +241,7 @@ export default {
             return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
         }
 
-        const refreshToken =  cookie?.refreshToken;
+        const refreshToken = cookie?.refreshToken;
         const user = await UserModel.findOne({ refreshToken });
         if (!user) {
             return res.status(404).json({ success: false, message: 'No refresh token present in database or not matched' });
@@ -254,7 +260,7 @@ export default {
         if (!cookie?.refreshToken) {
             return res.status(404).json({ success: false, message: 'No refresh token in cookies' });
         }
-        const refreshToken =  cookie?.refreshToken;
+        const refreshToken = cookie?.refreshToken;
         const user = await UserModel.findOne({ refreshToken });
         if (!user) {
             res.clearCookie('refreshToken', {
@@ -273,5 +279,34 @@ export default {
         });
 
         return res.status(200).json({ success: false, message: 'Successfully logout' });
+    },
+
+    handlePasswordReset: async (req, res) => {
+        try {
+            const { _id } = req?.user?._id;
+            const { body } = req;
+
+            userResetPasswordValidation.validateSync(body, { abortEarly: false, stripUnknown: true });
+
+            let checkID = validateMongodbId(_id);
+
+            if (!checkID) {
+                return res.status(404).json({ success: false, error: 'This id is not valid or not found' });
+            }
+
+            const user = await UserModel.findById(_id);
+            if (req?.body?.password) {
+                user.password = req?.body?.password;
+                const updatePassword = await user.save();
+                return res.status(200).json({ success: true, data: updatePassword });
+            }
+
+        } catch (err) {
+            if (!err?.errors) {
+                return res.status(500).json({ success: false, error: err?.message });
+            } else {
+                return res.status(428).json({ success: false, error: err?.errors });
+            }
+        }
     },
 }

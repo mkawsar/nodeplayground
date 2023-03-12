@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 
 export const USER_TYPE = {
@@ -49,11 +50,11 @@ const userSchema = new mongoose.Schema(
         address: [{ type: mongoose.Schema.Types.ObjectId, ref: 'addresses' }],
         wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
         refreshToken: {
-            type: String
+            type: String,
         },
         passwordChangedAt: Date,
         passwordResetToken: String,
-        passwordChangedAt: Date
+        passwordResetExpires: Date,
     },
     {
         timestamps: true
@@ -72,6 +73,13 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.isPasswordMatched = async function (enterPassword) {
     return await bcrypt.compare(enterPassword, this.password);
+};
+
+userSchema.methods.createPasswordResetToken = async function () {
+    const token = crypto.randomBytes(32).toString('hex');
+    this.passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
+    this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
+    return token;
 };
 
 export default mongoose.model('users', userSchema);
