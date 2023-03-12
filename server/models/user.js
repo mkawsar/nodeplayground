@@ -50,7 +50,10 @@ const userSchema = new mongoose.Schema(
         wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'products' }],
         refreshToken: {
             type: String
-        }
+        },
+        passwordChangedAt: Date,
+        passwordResetToken: String,
+        passwordChangedAt: Date
     },
     {
         timestamps: true
